@@ -618,6 +618,10 @@ int sCylinderBoxData::_cldClipCylinderToBox()
     dConstructPlane(vTemp1,m_vBoxHalfSize[0],plPlane);
     if(!dClipEdgeToPlane( m_vEp0, m_vEp1, plPlane )) 
     { 
+		/*修复Cylinder穿越薄的Box，下面还有5个类似判断
+			穿越发生时m_vEp0和m_vEp1都在Box的外部
+		*/
+		if( dPointPlaneDistance(  m_vCylinderPos ,plPlane )<0 )	
         return 0; 
     }
 
@@ -626,6 +630,7 @@ int sCylinderBoxData::_cldClipCylinderToBox()
     dConstructPlane(vTemp1,m_vBoxHalfSize[1],plPlane);
     if(!dClipEdgeToPlane( m_vEp0, m_vEp1, plPlane )) 
     { 
+		if( dPointPlaneDistance(  m_vCylinderPos ,plPlane )<0 )
         return 0; 
     }
 
@@ -634,6 +639,7 @@ int sCylinderBoxData::_cldClipCylinderToBox()
     dConstructPlane(vTemp1,m_vBoxHalfSize[2],plPlane);
     if(!dClipEdgeToPlane( m_vEp0, m_vEp1, plPlane )) 
     { 
+		if( dPointPlaneDistance(  m_vCylinderPos ,plPlane )<0 )
         return 0; 
     }
 
@@ -643,6 +649,7 @@ int sCylinderBoxData::_cldClipCylinderToBox()
     dConstructPlane(vTemp1,m_vBoxHalfSize[0],plPlane);
     if(!dClipEdgeToPlane( m_vEp0, m_vEp1, plPlane )) 
     { 
+		if( dPointPlaneDistance(  m_vCylinderPos ,plPlane )<0 )
         return 0; 
     }
 
@@ -652,6 +659,7 @@ int sCylinderBoxData::_cldClipCylinderToBox()
     dConstructPlane(vTemp1,m_vBoxHalfSize[1],plPlane);
     if(!dClipEdgeToPlane( m_vEp0, m_vEp1, plPlane )) 
     { 
+		if( dPointPlaneDistance(  m_vCylinderPos ,plPlane )<0 )
         return 0; 
     }
 
@@ -661,6 +669,7 @@ int sCylinderBoxData::_cldClipCylinderToBox()
     dConstructPlane(vTemp1,m_vBoxHalfSize[2],plPlane);
     if(!dClipEdgeToPlane( m_vEp0, m_vEp1, plPlane )) 
     { 
+		if( dPointPlaneDistance(  m_vCylinderPos ,plPlane )<0 )
         return 0; 
     }
 
