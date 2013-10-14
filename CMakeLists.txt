@@ -62,11 +62,6 @@ set(HEADER_FILES
 	)
 	
 set(SOURCE_FILES 
-	ode/src/fastdot.c
-	ode/src/fastldlt.c
-	ode/src/fastlsolve.c
-	ode/src/fastltsolve.c
-	ode/src/nextafterf.c
 	ode/src/array.cpp
 	ode/src/box.cpp
 	ode/src/capsule.cpp
@@ -83,7 +78,6 @@ set(SOURCE_FILES
 	ode/src/collision_trimesh_ccylinder.cpp
 	ode/src/collision_trimesh_disabled.cpp
 	ode/src/collision_trimesh_distance.cpp
-	ode/src/collision_trimesh_gimpact.cpp
 	ode/src/collision_trimesh_opcode.cpp
 	ode/src/collision_trimesh_plane.cpp
 	ode/src/collision_trimesh_ray.cpp
@@ -91,11 +85,14 @@ set(SOURCE_FILES
 	ode/src/collision_trimesh_trimesh.cpp
 	ode/src/collision_trimesh_trimesh_new.cpp
 	ode/src/collision_util.cpp
-	ode/src/collision_libccd.cpp
 	ode/src/convex.cpp
 	ode/src/cylinder.cpp
 	ode/src/error.cpp
 	ode/src/export-dif.cpp
+	ode/src/fastdot.c
+	ode/src/fastldlt.c
+	ode/src/fastlsolve.c
+	ode/src/fastltsolve.c
 	ode/src/heightfield.cpp
 	ode/src/lcp.cpp
 	ode/src/mass.cpp
@@ -103,6 +100,8 @@ set(SOURCE_FILES
 	ode/src/matrix.cpp
 	ode/src/memory.cpp
 	ode/src/misc.cpp
+	ode/src/nextafterf.c
+	ode/src/objects.cpp
 	ode/src/obstack.cpp
 	ode/src/ode.cpp
 	ode/src/odeinit.cpp
@@ -115,14 +114,35 @@ set(SOURCE_FILES
 	ode/src/rotation.cpp
 	ode/src/sphere.cpp
 	ode/src/step.cpp
+	ode/src/threading_base.cpp
+	ode/src/threading_impl.cpp
+	ode/src/threading_pool_posix.cpp
+	ode/src/threading_pool_win.cpp
 	ode/src/timer.cpp
 	ode/src/util.cpp
-	libccd/src/alloc.c
-	libccd/src/ccd.c
-	libccd/src/mpr.c
-	libccd/src/polytope.c
-	libccd/src/support.c
-	libccd/src/vec3.c
+	ode/src/joints/amotor.cpp
+	ode/src/joints/ball.cpp
+	ode/src/joints/contact.cpp
+	ode/src/joints/dball.cpp
+	ode/src/joints/dhinge.cpp
+	ode/src/joints/fixed.cpp
+	ode/src/joints/hinge.cpp
+	ode/src/joints/hinge2.cpp
+	ode/src/joints/joint.cpp
+	ode/src/joints/lmotor.cpp
+	ode/src/joints/null.cpp
+	ode/src/joints/piston.cpp
+	ode/src/joints/plane2d.cpp
+	ode/src/joints/pr.cpp
+	ode/src/joints/pu.cpp
+	ode/src/joints/slider.cpp
+	ode/src/joints/universal.cpp
+	
+	ou/src/ou/atomic.cpp
+	ou/src/ou/customization.cpp
+	ou/src/ou/malloc.cpp
+	ou/src/ou/threadlocalstorage.cpp
+
 	OPCODE/OPC_AABBCollider.cpp
 	OPCODE/OPC_AABBTree.cpp
 	OPCODE/OPC_BaseModel.cpp
@@ -141,22 +161,7 @@ set(SOURCE_FILES
 	OPCODE/OPC_TreeBuilders.cpp
 	OPCODE/OPC_TreeCollider.cpp
 	OPCODE/OPC_VolumeCollider.cpp
-	OPCODE/Opcode.cpp	
-	ode/src/joints/amotor.cpp
-	ode/src/joints/ball.cpp
-	ode/src/joints/contact.cpp
-	ode/src/joints/fixed.cpp
-	ode/src/joints/hinge.cpp
-	ode/src/joints/hinge2.cpp
-	ode/src/joints/joint.cpp
-	ode/src/joints/lmotor.cpp
-	ode/src/joints/null.cpp
-	ode/src/joints/piston.cpp
-	ode/src/joints/plane2d.cpp
-	ode/src/joints/pr.cpp
-	ode/src/joints/pu.cpp
-	ode/src/joints/slider.cpp
-	ode/src/joints/universal.cpp	
+	OPCODE/Opcode.cpp
 	OPCODE/Ice/IceAABB.cpp
 	OPCODE/Ice/IceContainer.cpp
 	OPCODE/Ice/IceHPoint.cpp
@@ -171,7 +176,7 @@ set(SOURCE_FILES
 	OPCODE/Ice/IceRevisitedRadix.cpp
 	OPCODE/Ice/IceSegment.cpp
 	OPCODE/Ice/IceTriangle.cpp
-	OPCODE/Ice/IceUtils.cpp		
+	OPCODE/Ice/IceUtils.cpp	
 	)
 	
 	SOURCE_GROUP("Source Files" FILES
@@ -181,6 +186,8 @@ set(SOURCE_FILES
 	ode/src/joints/amotor.cpp
 	ode/src/joints/ball.cpp
 	ode/src/joints/contact.cpp
+	ode/src/joints/dball.cpp
+	ode/src/joints/dhinge.cpp
 	ode/src/joints/fixed.cpp
 	ode/src/joints/hinge.cpp
 	ode/src/joints/hinge2.cpp
@@ -232,7 +239,7 @@ set(SOURCE_FILES
 	OPCODE/OPC_TreeBuilders.cpp
 	OPCODE/OPC_TreeCollider.cpp
 	OPCODE/OPC_VolumeCollider.cpp
-	OPCODE/Opcode.cpp	
+	OPCODE/Opcode.cpp
 	)
 	
 	SOURCE_GROUP("Header Files" FILES
@@ -263,10 +270,13 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${ode_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${ode_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${ode_BINARY_DIR}/bin)
 
-add_definitions("/DdDOUBLE")
-add_definitions("/DCCD_DOUBLE")
-add_definitions("/DdLIBCCD_CYL_CYL")
-add_definitions("/DdLIBCCD_ENABLED")
+#add_definitions("/DdDOUBLE")
+#add_definitions("/DCCD_DOUBLE")
+#add_definitions("/DdLIBCCD_CYL_CYL")
+#add_definitions("/DdLIBCCD_ENABLED")
+if(APPLE)
+	add_definitions("/DMAC_OS_X_VERSION=1080")
+endif()
 
 include_directories(
 include

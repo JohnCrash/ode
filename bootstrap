@@ -9,7 +9,7 @@ fi
 echo "Running aclocal"
 aclocal -I m4 --install || exit 1
 # on Mac libtoolize is called glibtoolize
-LIBTOOLIZE=libtoolize
+LIBTOOLIZE=glibtoolize
 #if [ `uname -s` = Darwin ]; then
 #    LIBTOOLIZE=glibtoolize
 #fi
