@@ -30,7 +30,7 @@ email: projectileman@yahoo.com
 
 -----------------------------------------------------------------------------
 */
-
+#include <ode/odeconfig.h>
 #include "config.h"
 
 #include <math.h>

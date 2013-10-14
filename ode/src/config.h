@@ -244,7 +244,7 @@
 #define X86_64_SYSTEM 1
 
 /* libou namespace for ODE */
-#define _OU_NAMESPACE odeou
+#define _OU_NAMESPACE ou
 
 /* Target OS setting for OU Library */
 #define _OU_TARGET_OS _OU_TARGET_OS_MAC

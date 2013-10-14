@@ -3,12 +3,12 @@ cmake_minimum_required(VERSION 2.8)
 project(ode)
 
 # Include necessary submodules
-#set(CMAKE_MODULE_PATH
-#	"${iRobot_SOURCE_DIR}/CMake"
-#	"${iRobot_SOURCE_DIR}/CMake/Utils"
-#	"${iRobot_SOURCE_DIR}/CMake/Packages"
-#	"${iRobot_SOURCE_DIR}/CMake/Templates"
-#)
+set(CMAKE_MODULE_PATH
+	"${iRobot_SOURCE_DIR}/CMake"
+	"${iRobot_SOURCE_DIR}/CMake/Utils"
+	"${iRobot_SOURCE_DIR}/CMake/Packages"
+	"${iRobot_SOURCE_DIR}/CMake/Templates"
+)
 
 set(HEADER_FILES 
 	include/ode/collision.h
@@ -142,8 +142,9 @@ set(SOURCE_FILES
 	ou/src/ou/customization.cpp
 	ou/src/ou/malloc.cpp
 	ou/src/ou/threadlocalstorage.cpp
-
-	OPCODE/OPC_AABBCollider.cpp
+	)
+	
+set(OPCODE_SOURCES
 	OPCODE/OPC_AABBTree.cpp
 	OPCODE/OPC_BaseModel.cpp
 	OPCODE/OPC_Collider.cpp
@@ -177,8 +178,28 @@ set(SOURCE_FILES
 	OPCODE/Ice/IceSegment.cpp
 	OPCODE/Ice/IceTriangle.cpp
 	OPCODE/Ice/IceUtils.cpp	
-	)
-	
+   )
+set(LIBCCD_SOURCES
+	libccd/src/alloc.c
+	libccd/src/ccd.c
+	libccd/src/mpr.c
+	libccd/src/polytope.c
+	libccd/src/support.c
+	libccd/src/vec3.c	
+   )
+set(GIMPACT_SOURCES
+	GIMPACT/src/gim_boxpruning.cpp
+	GIMPACT/src/gim_contact.cpp
+	GIMPACT/src/gim_math.cpp
+	GIMPACT/src/gim_memory.cpp
+	GIMPACT/src/gim_tri_tri_overlap.cpp
+	GIMPACT/src/gim_trimesh.cpp
+	GIMPACT/src/gim_trimesh_capsule_collision.cpp
+	GIMPACT/src/gim_trimesh_ray_collision.cpp
+	GIMPACT/src/gim_trimesh_sphere_collision.cpp
+	GIMPACT/src/gim_trimesh_trimesh_collision.cpp
+	GIMPACT/src/gimpact.cpp
+   )
 	SOURCE_GROUP("Source Files" FILES
 	)
 	
@@ -221,7 +242,6 @@ set(SOURCE_FILES
 	)
 	
 	SOURCE_GROUP("Source Files\\OPCODE" FILES
-	OPCODE/OPC_AABBCollider.cpp
 	OPCODE/OPC_AABBTree.cpp
 	OPCODE/OPC_BaseModel.cpp
 	OPCODE/OPC_Collider.cpp
@@ -241,10 +261,21 @@ set(SOURCE_FILES
 	OPCODE/OPC_VolumeCollider.cpp
 	OPCODE/Opcode.cpp
 	)
-	
+	SOURCE_GROUP("Source Files\\GIMPACT" FILES
+	GIMPACT/src/gim_boxpruning.cpp
+	GIMPACT/src/gim_contact.cpp
+	GIMPACT/src/gim_math.cpp
+	GIMPACT/src/gim_memory.cpp
+	GIMPACT/src/gim_tri_tri_overlap.cpp
+	GIMPACT/src/gim_trimesh.cpp
+	GIMPACT/src/gim_trimesh_capsule_collision.cpp
+	GIMPACT/src/gim_trimesh_ray_collision.cpp
+	GIMPACT/src/gim_trimesh_sphere_collision.cpp
+	GIMPACT/src/gim_trimesh_trimesh_collision.cpp
+	GIMPACT/src/gimpact.cpp
+	)
 	SOURCE_GROUP("Header Files" FILES
 	)
-	
 	SOURCE_GROUP("Header Files\\Joints" FILES
 	ode/src/joints/universal.h
 	ode/src/joints/slider.h
@@ -264,37 +295,112 @@ set(SOURCE_FILES
 	ode/src/joints/amotor.h	
 	)
 	
+	SOURCE_GROUP("Source Files\\libccd" FILES
+	libccd/src/alloc.c
+	libccd/src/ccd.c
+	libccd/src/mpr.c
+	libccd/src/polytope.c
+	libccd/src/support.c
+	libccd/src/vec3.c
+	)
+	SOURCE_GROUP("Header Files\\libccd" FILES
+	libccd/src/ccd/alloc.h
+	libccd/src/ccd/ccd.h
+	libccd/src/ccd/compiler.h
+	libccd/src/ccd/dbg.h
+	libccd/src/ccd/list.h
+	libccd/src/ccd/polytope.h
+	libccd/src/ccd/precision.h
+	libccd/src/ccd/quat.h
+	libccd/src/ccd/simplex.h
+	libccd/src/ccd/support.h
+	libccd/src/ccd/vec3.h
+	)
+	SOURCE_GROUP("Header Files\\GIMPACT" FILES
+	GIMPACT/include/GIMPACT/gim_boxpruning.h
+	GIMPACT/include/GIMPACT/gim_contact.h
+	GIMPACT/include/GIMPACT/gim_geometry.h
+	GIMPACT/include/GIMPACT/gim_math.h
+	GIMPACT/include/GIMPACT/gim_memory.h
+	GIMPACT/include/GIMPACT/gim_radixsort.h
+	GIMPACT/include/GIMPACT/gim_tri_capsule_collision.h
+	GIMPACT/include/GIMPACT/gim_tri_collision.h
+	GIMPACT/include/GIMPACT/gim_tri_sphere_collision.h
+	GIMPACT/include/GIMPACT/gim_trimesh.h
+	GIMPACT/include/GIMPACT/gimpact.h
+	)
+
+# 标准头文件搜索目录
+include_directories(
+include
+ode/src
+ode/src/joints
+ou/include
+)	
 # Specify build paths
 set(ode_WORK_DIR ${ode_BINARY_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${ode_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${ode_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${ode_BINARY_DIR}/bin)
 
-#add_definitions("/DdDOUBLE")
-#add_definitions("/DCCD_DOUBLE")
-#add_definitions("/DdLIBCCD_CYL_CYL")
-#add_definitions("/DdLIBCCD_ENABLED")
-if(APPLE)
-	add_definitions("/DMAC_OS_X_VERSION=1080")
+# 精度设置
+option(PRECISION_SINGLE "Precision single" TRUE)
+if(PRECISION_SINGLE)
+	add_definitions("/DCCD_IDESINGLE")
+else()
+	add_definitions("/DCCD_IDEDOUBLE")
+endif()
+# 库是共享还是静态
+option(ODE_STATIC "Static build" FALSE)
+if (ODE_STATIC)
+	set(ODE_LIB_TYPE STATIC)
+else()
+	set(ODE_LIB_TYPE SHARED)
+endif()
+# 是否创建Demos
+# 附加选项
+set(ODE_TRIMESH 1 CACHE STRING
+"Use the specified system for trimesh support,(default 1)
+	1 - OPCODE
+	2 - GIMPACT
+	3 - NONE"
+)
+option(ODE_ENABLE_LIBCCD "Use all libccd colliders
+		(cylinder-cylinder box-cylinder capsule-cylinder convex-box..." FALSE)
+
+if(ODE_TRIMESH EQUAL 1)
+	set(SOURCE_FILES ${SOURCE_FILES} ${OPCODE_SOURCES})
+	include_directories(
+		OPCODE
+	)
+elseif(ODE_TRIMESH EQUAL 2)
+	set(SOURCE_FILES ${SOURCE_FILES} ${GIMPACT_SOURCES})
+	include_directories(
+		GIMPACT/include
+	)	
 endif()
 
-include_directories(
-include
-ode/src
-ode/src/joints
-opcode
-ou/include
-GIMPACT/include
-ou/include
-libccd/src
-)
+if(ODE_ENABLE_LIBCCD)
+	set(SOURCE_FILES ${SOURCE_FILES} ${LIBCCD_SOURCES})
+	include_directories(
+		libccd/src
+	)
+endif()
 
-if (WIN32)
-	add_definitions("/DODE_DLL")
-	add_library(ode SHARED ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
-elseif(APPLE)
-	add_definitions("/DODE_LIB")
-	add_library(ode STATIC ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
-endif ()
+if(APPLE)
+	#OSX 10.8
+	add_definitions("/DMAC_OS_X_VERSION=1080")
+endif()
+		
+get_target_property(ICLUDE_DIRS ode VERSION)
+#if (WIN32)
+#	add_definitions("/DODE_DLL")
+#	add_library(ode SHARED ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
+#elseif(APPLE)
+#	add_definitions("/DODE_LIB")
+#	add_library(ode STATIC ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
+#endif ()
+add_library(ode ${ODE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
+
 
 
