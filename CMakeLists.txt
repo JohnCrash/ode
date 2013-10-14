@@ -358,6 +358,11 @@ else()
 	set(ODE_LIB_TYPE SHARED)
 endif()
 # 是否创建Demos
+option(ODE_DEMOS "Build all demos" FALSE)
+if(ODE_DEMOS)
+	add_subdirectory(drawstuff)
+	add_subdirectory(ode/demo)
+endif()
 # 附加选项
 set(ODE_TRIMESH 1 CACHE STRING
 "Use the specified system for trimesh support,(default 1)
@@ -367,17 +372,20 @@ set(ODE_TRIMESH 1 CACHE STRING
 )
 option(ODE_ENABLE_LIBCCD "Use all libccd colliders
 		(cylinder-cylinder box-cylinder capsule-cylinder convex-box..." FALSE)
-
 if(ODE_TRIMESH EQUAL 1)
 	set(SOURCE_FILES ${SOURCE_FILES} ${OPCODE_SOURCES})
 	include_directories(
 		OPCODE
 	)
+	add_definitions("/DdTRIMESH_ENABLED")
+	add_definitions("/DdTRIMESH_OPCODE")
 elseif(ODE_TRIMESH EQUAL 2)
 	set(SOURCE_FILES ${SOURCE_FILES} ${GIMPACT_SOURCES})
 	include_directories(
 		GIMPACT/include
 	)	
+	add_definitions("/DdTRIMESH_ENABLED")
+	add_definitions("/DdTRIMESH_GIMPACT")
 endif()
 
 if(ODE_ENABLE_LIBCCD)
