@@ -23,6 +23,7 @@
     "feedback",
     "friction",
     "gyroscopic",
+    "gyro2",
     "heightfield",
     "hinge",
     "I",
@@ -35,10 +36,12 @@
     "ode",
     "piston",
     "plane2d",
+    "rfriction",
     "slider",
     "space",
     "space_stress",
     "step",
+    "transmission"
   }
 
   local trimesh_demos = {
@@ -239,6 +242,10 @@
     configuration { "vs*" }
       defines { "_CRT_SECURE_NO_DEPRECATE" }
 
+    -- enable M_* macros from math.h
+    configuration { "vs*" }
+      defines { "_USE_MATH_DEFINES" }
+
     -- don't remember why we had to do this	
     configuration { "vs2002 or vs2003", "*Lib" }
       flags  { "StaticRuntime" }
@@ -308,6 +315,18 @@
       includedirs { "../ou/include" }
       files   { "../ou/**.h", "../ou/**.cpp" }
       defines { "_OU_NAMESPACE=odeou" }
+
+      if _ACTION == "gmake" and ( os.get() == "linux" or os.get() == "bsd" ) then
+        buildoptions { "-pthread" }
+        linkoptions { "-pthread" }
+      end
+
+      if _ACTION == "gmake" and os.get() == "windows" then
+        buildoptions { "-mthreads" }
+        linkoptions { "-mthreads" }
+      end
+
+      -- TODO: MacOSX probably needs something too
     end
 
       
@@ -358,10 +377,10 @@
       defines "_DLL"
 
     configuration { "Debug" }
-	  targetname "oded"
+      targetname "oded"
 	  
-	configuration { "Release" }
-	  targetname "ode"
+    configuration { "Release" }
+      targetname "ode"
 	  
     configuration { "DebugSingle*" }
       targetname "ode_singled"
@@ -422,29 +441,30 @@
 ----------------------------
 -- Write precision headers
 ----------------------------
-  
-  function generateheader(headerfile, placeholder, precstr)
-    local outfile = io.open(headerfile, "w")
-    for i in io.lines(headerfile .. ".in")
-    do
-      local j,_ = string.gsub(i, placeholder, precstr)
-      --print("writing " .. j .. " into " .. headerfile)
-      outfile:write(j .. "\n")
+  if _ACTION and _ACTION ~= "clean" then
+    function generateheader(headerfile, placeholder, precstr)
+      local outfile = io.open(headerfile, "w")
+      for i in io.lines(headerfile .. ".in")
+      do
+        local j,_ = string.gsub(i, placeholder, precstr)
+        --print("writing " .. j .. " into " .. headerfile)
+        outfile:write(j .. "\n")
+      end
+      outfile:close()
     end
-    outfile:close()
-  end
-  
-  function generate(precstr)
-    generateheader("../include/ode/precision.h", "@ODE_PRECISION@", "d" .. precstr)
-    generateheader("../libccd/src/ccd/precision.h", "@CCD_PRECISION@", "CCD_" .. precstr)
-  end
-  
-  if _OPTIONS["only-single"] then
-    generate("SINGLE")
-  elseif _OPTIONS["only-double"] then
-    generate("DOUBLE")
-  else 
-    generate("UNDEFINEDPRECISION")
+    
+    function generate(precstr)
+      generateheader("../include/ode/precision.h", "@ODE_PRECISION@", "d" .. precstr)
+      generateheader("../libccd/src/ccd/precision.h", "@CCD_PRECISION@", "CCD_" .. precstr)
+    end
+    
+    if _OPTIONS["only-single"] then
+      generate("SINGLE")
+    elseif _OPTIONS["only-double"] then
+      generate("DOUBLE")
+    else 
+      generate("UNDEFINEDPRECISION")
+    end
   end
 
 ----------------------------------------------------------------------

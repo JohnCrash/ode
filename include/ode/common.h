@@ -43,6 +43,9 @@ extern "C" {
 #ifndef M_PI
 #define M_PI REAL(3.1415926535897932384626433832795029)
 #endif
+#ifndef M_PI_2
+#define M_PI_2 REAL(1.5707963267948966192313216916398)
+#endif
 #ifndef M_SQRT1_2
 #define M_SQRT1_2 REAL(0.7071067811865475244008443621048490)
 #endif
@@ -108,6 +111,7 @@ typedef dReal dQuaternion[4];
 #define dCos(x) (cosf(x))				/* cosine */
 #define dFabs(x) (fabsf(x))			/* absolute value */
 #define dAtan2(y,x) (atan2f(y,x))		/* arc tangent with 2 args */
+#define dAcos(x) (acosf(x))
 #define dFMod(a,b) (fmodf(a,b))		/* modulo */
 #define dFloor(x) floorf(x)			/* floor */
 #define dCeil(x) ceilf(x)			/* ceil */
@@ -143,6 +147,7 @@ typedef dReal dQuaternion[4];
 #define dCos(x) cos(x)
 #define dFabs(x) fabs(x)
 #define dAtan2(y,x) atan2((y),(x))
+#define dAcos(x) acos(x)
 #define dFMod(a,b) (fmod((a),(b)))
 #define dFloor(x) floor(x)
 #define dCeil(x) ceil(x)
@@ -162,6 +167,7 @@ typedef dReal dQuaternion[4];
 #else
 #error You must #define dSINGLE or dDOUBLE
 #endif
+
 
 /* internal object types (all prefixed with `dx') */
 
@@ -211,7 +217,8 @@ typedef enum {
   dJointTypePU,
   dJointTypePiston,
   dJointTypeDBall,
-  dJointTypeDHinge
+  dJointTypeDHinge,
+  dJointTypeTransmission,
 } dJointType;
 
 
@@ -253,6 +260,8 @@ enum {
   dParamLoStop = start, \
   dParamHiStop, \
   dParamVel, \
+  dParamLoVel, \
+  dParamHiVel, \
   dParamFMax, \
   dParamFudgeFactor, \
   dParamBounce, \
@@ -278,6 +287,8 @@ enum {
   dParamLoStop ## x = start, \
   dParamHiStop ## x, \
   dParamVel ## x, \
+  dParamLoVel ## x, \
+  dParamHiVel ## x, \
   dParamFMax ## x, \
   dParamFudgeFactor ## x, \
   dParamBounce ## x, \
@@ -308,6 +319,14 @@ enum {
 enum {
   dAMotorUser = 0,
   dAMotorEuler = 1
+};
+
+/* transmission joint mode numbers */
+
+enum {
+  dTransmissionParallelAxes = 0,
+  dTransmissionIntersectingAxes = 1,
+  dTransmissionChainDrive = 2
 };
 
 
